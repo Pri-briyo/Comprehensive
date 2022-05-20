@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="1985fed1-297f-46cc-92f5-df2a3b9d9600" activeEnvironment="Default" name="Comp_Assessment" resourceRoot="" soapui-version="5.7.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:RestService" id="625bcb16-3e01-4244-a1ad-c01412c28e65" wadlVersion="http://wadl.dev.java.net/2009/02" name="https://restcountries.com" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache/><con:endpoints><con:endpoint>https://restcountries.com</con:endpoint></con:endpoints><con:resource name="Lkr" path="/v3.1/currency/lkr" id="883af7d5-b9ef-42a0-8eaf-6b4ff9ebbe46"><con:settings/><con:parameters/><con:method name="Lkr 1" id="9cd96173-c40b-431e-8b06-c493b5194331" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/json</con:mediaType><con:status>200</con:status><con:params/><con:element>Response</con:element></con:representation><con:request name="Request 1" id="bbcd1900-f83e-4cad-a4d9-661c645da0ad" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>https://restcountries.com</con:endpoint><con:request/><con:originalUri>https://restcountries.com/v3.1/currency/lkr</con:originalUri><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource></con:interface><con:testSuite id="5561f362-33ab-4b33-84c3-c79726d0fc61" name="TestSuite 1"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="d24f04a3-0955-41f1-ba48-ae41a7143612" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TestCase 1" searchProperties="true"><con:settings/><con:testStep type="httprequest" name="HTTP Request" id="33a8cdeb-3896-4780-a16f-4c954b169e59"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e03ff60f-9a9d-4caa-8005-c56038076f15" name="HTTP Request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>https://restcountries.com/v3.1/currency/${#TestCase#currencyname}</con:endpoint><con:request/><con:assertion type="JsonPath Match" id="cc46cca8-6575-4e1e-b157-0931bf49e9b9" name="JsonPath Match"><con:configuration><path>[0]capital</path><content>["Sri Jayawardenepura Kotte"]</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="Simple Contains" id="c1c98a04-4794-4029-98b5-ce835197f0ba" name="Contains"><con:configuration><token>Sri Jayawardenepura Kotte</token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" id="d0638468-bcad-4834-9a36-501996aedfe6" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="Groovy Script" id="5f11db1d-ea44-45a9-ae05-13314fa1da2f"><con:settings/><con:config><script>import jxl.*
+import com.eviware.soapui.support.XmlHolder
+import com.eviware.soapui.impl.wsdl.testcase.WsdlTestRunContext
+import groovy.json.JsonSlurper
+
+Workbook wb=Workbook.getWorkbook(new File("C:\\Users\\mindsdet278\\currency.xlt"))
+Sheet sh=wb.getSheet(0)
+row=sh.getRows().toInteger()
+column =sh.getColumns().toInteger()
+log.info row
+log.info column
+for(i=0;i&lt;row;i++){
+	for(j=0;j&lt;column;j++){
+		def val=sh.getCell(j,i)
+		def cel=val.getContents()
+		if(cel=="currencyname"){
+			def id=sh.getCell(j+1,i)
+			def cval=id.getContents()
+			log.info cval
+			testRunner.testCase.setPropertyValue("currencyname",cval)
+		}
+	}
+}
+// to run http request
+def gettest=testRunner.testCase.testSuite.testCases["TestCase 1"].testSteps["HTTP Request"]
+def getcontext=new WsdlTestRunContext(gettest)
+gettest.run(testRunner,getcontext)
+//to validate response
+def responseCont=testRunner.testCase.testSuite.testCases["TestCase 1"].testSteps["HTTP Request"].getPropertyValue("Response")
+slurperres=new JsonSlurper().parseText(responseCont)
+def respon=((slurperres.capital[0]).toString())
+def actual=testRunner.testCase.testSuite.testCases["TestCase 1"].getPropertyValue("capital")
+log.info respon
+log.info actual
+//assert respon==actual
+if(respon==actual){
+	log.info "API-PASS"
+}
+else{
+	log.info "API-FAIL"
+}
+		
+	
+</script></con:config></con:testStep><con:properties><con:property><con:name>currencyname</con:name><con:value>lkr</con:value></con:property><con:property><con:name>capital</con:name><con:value>[Colombo]</con:value></con:property></con:properties></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>
